@@ -1,13 +1,46 @@
 #!/usr/bin/fish
 
+
+
+# SANITY CHECKS
 if ! is_root 
     print_error "NOT ROOT"
     exit 1
 end
 
-set -Ux WAN_INTERFACE ""
+if test ! -e ".router.config.fish"
+    print_error "CONFIG NOT FOUND! Corrupted install?"
+    exit 1
+end
 
-./router.config.fish
+if test ! -e ".router.start.fish"
+    print_error "STARTUP SCRIPT NOT FOUND! Corrupted install?"
+    exit 1
+end
+
+
+if test ! -e ".router.dnsvpn.fish"
+    print_error "DNSVPN SCRIPT NOT FOUND! Corrupted install?"
+    exit 1
+end
+
+# LOGIC START
+
+print_exec cp ./router.config.fish /usr/bin/router_config
+print_exec chmod 777 /usr/bin/router_config
+
+print_exec cp ./router.start.fish /usr/bin/router_start
+print_exec chmod 777 /usr/bin/router_start
+
+print_exec cp ./router.dnsvpn.fish /usr/bin/router_start_dnsvpn
+print_exec chmod 777 /usr/bin/router_start_dnsvpn
+
+if ! router_config
+    print_error "ROUTER CONFIG RETURNED AN ERROR! Aborting..."
+    exit 1
+end
+
+set -Ux WAN_INTERFACE ""
 
 if test ! -n "$WAN_INTERFACE"
     set interfaces (ip link list | grep -Eo "^[0-9]*: [A-z0-9]*" | grep -Po "(?![0-9]*:)(?! ).*")
@@ -40,8 +73,16 @@ if test ! -n "$WAN_INTERFACE"
     end
 end
 
-
 print_green "WAN_INTERFACE is: $WAN_INTERFACE"
 
+# setup forwarding
+
+print_exec echo 1 > /proc/sys/net/ipv4/ip_forward
 
 
+# setup the service and enable it
+
+print_exec cp ./router.service /etc/systemd/system/router.service
+print_exec systemctl daemon-reload
+print_exec systemctl stop router
+print_exec systemctl enable router

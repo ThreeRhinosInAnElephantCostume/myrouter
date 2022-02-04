@@ -1,0 +1,19 @@
+[Unit]
+# By default 'simple' is used, see also https://www.freedesktop.org/software/systemd/man/systemd.service.html#Type=
+# Type=simple|forking|oneshot|dbus|notify|idle
+Description=Autossh keepalive daemon
+## make sure we only start the service after network is up
+Wants=network-online.target
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/router_start
+# don't use 'nobody' if your script needs to access user files
+# (if User is not set the service will run as root)
+#User=nobody
+
+# Useful during debugging; remove it once the service is working
+#StandardOutput=console
+
+[Install]
+WantedBy=multi-user.target

@@ -37,9 +37,9 @@ print_exec cp ./fancontrol.py /usr/bin/fancontrol
 print_exec chmod 777 /usr/bin/fancontrol
 
 print_exec cp ./fancontrol.service /etc/systemd/system/fancontrol.service
-print_exec sudo systemctl daemon-reload
-print_exec sudo systemctl stop fancontrol
-print_exec sudo systemctl enable fancontrol
-print_exec sudo systemctl restart fancontrol
+print_exec systemctl daemon-reload
+print_exec systemctl stop fancontrol
+print_exec systemctl enable fancontrol
+print_exec systemctl restart fancontrol
 
 exit 0

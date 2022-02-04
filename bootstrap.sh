@@ -9,5 +9,4 @@ echo "Starting the install script"
 
 sudo ./install.fish
 
-
 echo "Bootstraping complete"

@@ -65,11 +65,33 @@ if ! is_root
     exit 1
 end
 
-# LOGIC START
+# INSTALLING DEPENDENCIES
+
+print_exec cd $BASEDIR
+
+echo "Installing dependencies"
+print_exec apt update
+if ! print_exec apt install (string split ' ' (cat ./dependencies.txt)) -y
+    print_error "apt failed to install some or all dependencies"
+    exit 1
+end
+echo "Successfully installed all dependencies"
+
+# APT FULL-UPGRADE
+
+echo "Performing a package upgrade"
+
+print_exec apt update
+print_exec apt full-upgrade -y
+print_exec apt autoremove -y
+
+echo "Done upgrading"
+
+# COPY UTILITIES
 
 echo "Copying utilities"
 
-print_exec $BASEDIR
+print_exec cd $BASEDIR
 print_exec cd "scripts/utils"
 
 
@@ -84,6 +106,8 @@ end
 
 print_success "Done copying utilities"
 
+# INSTALL FANCONTROL
+
 echo "Installing fancontrol"
 
 print_exec cd $BASEDIR
@@ -94,7 +118,40 @@ if ! ./fancontrol.install.fish
     exit 1
 end
 
+print_success "Done installing fancontrol"
+
+# INSTALL ROUTER_CORE
+
+echo "Installing router_core"
+
+print_exec cd $BASEDIR
+print_exec cd scripts/router_core
+
+if ! print_exec ./router.install.fish
+    print_error "Error installing router_core, aborting..."
+    exit 1 
+end
+
+print_success "Done installing router_core"
+
+# INSTALL AUTO_VPN
+
+echo "Installing auto_vpn"
+
+print_exec cd $BASEDIR
+print_exec cd scripts/vpn
+
+if ! print_exec ./autovpn.install.fish
+    print_error "Error installing auto_vpn, aborting..."
+    exit 1 
+end
+
+print_success "Done installing auto_vpn"
+
+# SUCCESS
+
 print_exec cd $BASEDIR 
 print_success "INSTALLATION SCUCCESSFUL!"
+print_warning "-----> RESTART REQUIRED! <-----"
 
 exit 0
