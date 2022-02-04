@@ -12,20 +12,41 @@ if ! router_config
     exit 1
 end
 
+if test ! -n "$WAN_INTERFACE"
+    print_error "WAN_INTERFACE IS UNDEFINED!"
+    exit 1
+end
+
+if test ! -n "$LAN_INTERFACE"
+    print_error "LAN_INTERFACE IS UNDEFINED!"
+    exit 1
+end
+
 # LOGIC START
 
-echo "setting up forwarding"
+echo "restarting interfaces..."
+
+print_exec ip link set $WAN_INTERFACE down
+print_exec ip link set $WAN_INTERFACE up
+print_exec ip link set $LAN_INTERFACE down
+print_exec ip link set $LAN_INTERFACE up
+
+echo "allowing one second for interfaces to get their shit together"
+
+sleep 1
+
 #set up forwarding
-print_exec iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
-print_exec iptables -A INPUT -i eth0 -j ACCEPT
-print_exec iptables -A INPUT -i eth1 -m state --state ESTABLISHED,RELATED -j ACCEPT
+echo "setting up forwarding"
+print_exec iptables -t nat -A POSTROUTING -o $WAN_INTERFACE -j MASQUERADE
+print_exec iptables -A INPUT -i $WAN_INTERFACE -j ACCEPT
+print_exec iptables -A INPUT -i $LAN_INTERFACE -m state --state ESTABLISHED,RELATED -j ACCEPT
 print_exec iptables -A OUTPUT -j ACCEPT
 
 echo "setting up packet multithreading"
 #This may or may not increase performance
 #Remove if it causes any issues
-print_exec echo 2 > /sys/class/net/eth1/queues/rx-0/rps_cpus
-print_exec echo 1 > /sys/class/net/eth0/queues/rx-0/rps_cpus
+print_exec echo 2 > /sys/class/net/$LAN_INTERFACE/queues/rx-0/rps_cpus
+print_exec echo 1 > /sys/class/net/$WAN_INTERFACE/queues/rx-0/rps_cpus
 
 echo "ensure that ipv6 is disabled" # also made changes to /etc/sysctl.conf and /etc/sysctl.d/40-ipv6.con
 print_exec ip6tables -P INPUT DROP
