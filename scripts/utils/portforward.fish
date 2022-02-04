@@ -12,8 +12,8 @@ end
 
 function print_help
     printf "\n"
-    echo "forward: forward a port on device for a host"
-    echo "forward [DEVICE] [IP] [PORT] [opt TARGET_PORT] [opt --remove]"
+    echo "portforward: forward a port on device for a host"
+    echo "portforward [DEVICE] [IP] [PORT] [opt TARGET_PORT] [opt --remove]"
     printf "\n"
 end
 

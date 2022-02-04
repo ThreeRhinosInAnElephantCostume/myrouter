@@ -11,11 +11,11 @@ import sys
 import pathlib
 
 TEMP_PATH = "/sys/class/thermal/thermal_zone0/temp"
-CONFIG_PATH_REQ_DIRS = ["/etc/fanctonrol"]
-CONFIG_PATH = "/etc/fanctonrol/fancontrol.config.json"
+CONFIG_PATH_REQ_DIRS = ["/etc/fancontrol"]
+CONFIG_PATH = "/etc/fancontrol/fancontrol.config.json"
 DEFAULT_CONFIG_PATH = "fancontrol.default.json"
 
-DELAY=15
+DELAY=2
 
 ADDRESS=0x42
 
@@ -147,8 +147,6 @@ while(True):
         i = 1
         while i < len(curve):
             if temp >= prev[0] and temp <= curve[i][0]:
-                print(prev)
-                print(curve[i])
                 power = prev[1] + ((temp-prev[0])/(curve[i][0]-prev[0]))*(curve[i][1]-prev[1])
                 break
             prev = curve[i]
