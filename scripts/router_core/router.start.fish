@@ -79,3 +79,13 @@ print_exec touch /etc/resolv.conf
 echo "nameserver 127.0.0.1" > /etc/resolv.conf
 print_exec chattr +i /etc/resolv.conf
 
+#double-ensure forwarding
+
+echo 1 > /proc/sys/net/ipv4/ip_forward
+
+# setup wifi
+
+print_exec sysctl -w net.ipv4.ip_forward=1
+print_exec iptables -A FORWARD -i $WIFI_INTERFACE -o $LAN_INTERFACE -j ACCEPT
+print_exec iptables -A FORWARD -i $LAN_INTERFACE -o $WIFI_INTERFACE -j ACCEPT
+print_exec ip route add 192.168.0.0/24 dev $WIFI_INTERFACE

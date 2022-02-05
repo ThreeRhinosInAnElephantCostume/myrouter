@@ -44,17 +44,11 @@ echo "Setting up hostapd with:"
 echo "SSID=$SSID"
 echo "PASSWORD=$PASSWORD"
 
-cp ./bridgeconfig.netdev /etc/systemd/network/bridge-br0.netdev
-cat ./bridgemember.network | sed "s/LAN_INTERFACE/$LAN_INTERFACE/g" > /etc/systemd/network/br0-member-eth0.network
-
 print_exec systemctl unmask hostapd
 print_exec systemctl enable hostapd
 
 print_exec systemctl enable systemd-networkd
 
-echo "denyinterfaces wlan0 eth0" > "/etc/dnsmasq.d/00-myconf.conf"
-echo "interface br0" >> "/etc/dnsmasq.d/00-myconf.conf"
-
-cat ./hostapd.default.conf | sed "s/SSID/$SSID/g" | sed "s/PASSWORD/$PASSWORD/g" > /etc/hostapd/hostapd.conf
+cat ./hostapd.default.conf | sed "s/SSID/$SSID/g" | sed "s/PASSWORD/$PASSWORD/g" | sed "s/WIFI_INTERFACE/$WIFI_INTERFACE/g"  > /etc/hostapd/hostapd.conf
 
 rfkill unblock wlan

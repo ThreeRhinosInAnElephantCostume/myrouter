@@ -89,6 +89,10 @@ echo $WAN_INTERFACE > "/etc/router/WAN_INTERFACE"
 
 # setup forwarding
 
+cat "/etc/ufw/sysctl.conf" | sed "s/#net\/ipv4\/ip_forward=1/net\/ipv4\/ip_forward=1/g" > "./tmp.conf"
+print_exec cp "./tmp.conf" "/etc/ufw/sysctl.conf"
+print_exec rm "./tmp.conf"
+
 echo 1 > /proc/sys/net/ipv4/ip_forward
 
 
