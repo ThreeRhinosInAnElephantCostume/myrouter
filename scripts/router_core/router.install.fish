@@ -8,18 +8,18 @@ if ! is_root
     exit 1
 end
 
-if test ! -e ".router.config.fish"
+if test ! -e "./router.config.fish"
     print_error "CONFIG NOT FOUND! Corrupted install?"
     exit 1
 end
 
-if test ! -e ".router.start.fish"
+if test ! -e "./router.start.fish"
     print_error "STARTUP SCRIPT NOT FOUND! Corrupted install?"
     exit 1
 end
 
 
-if test ! -e ".router.dnsvpn.fish"
+if test ! -e "./router.dnsvpn.fish"
     print_error "DNSVPN SCRIPT NOT FOUND! Corrupted install?"
     exit 1
 end
