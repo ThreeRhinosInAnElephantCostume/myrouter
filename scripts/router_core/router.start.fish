@@ -86,7 +86,7 @@ print_exec sysctl -w net.ipv4.ip_forward=1
 
 # setup wifi
 
-print_exec ip addr add $WIFI_NET_IP_MASK dev $WIFI_INTERFACE
+print_exec ip addr add $WIFI_ROOT_IP_MASK dev $WIFI_INTERFACE
 print_exec ip route add $WIFI_NET_IP_MASK via $WIFI_ROOT_IP dev $WIFI_INTERFACE
 print_exec ip route add $LAN_NET_IP_MASK via $LAN_ROOT_IP dev $LAN_INTERFACE
 
