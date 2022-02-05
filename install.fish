@@ -1,58 +1,14 @@
 #!/usr/bin/fish
 
-# GLOBAL FUNCTIONS
-
-# returns  0 if true, 1 if false
-function is_root 
-    return (test (id -u) -eq 0)
+if test ! -e ./commands.fish
+    echo "COMMAND FILE NOT FOUND! Are you sure you've started the script from the correct directory?"
+    exit 1
 end
 
-# prints its arguments, then executes them as a command
-function print_exec
-    echo ">>> $argv"
-    $argv
+if ! ./commands.fish 
+    echo "COULD NOT LOAD COMMANDS!"
+    exit 1
 end
-
-set RED '\033[0;31m'
-set YELLOW '\033[0;33m'
-set GREEN '\033[0;32m'
-set NULL_COLOR '\033[0m'
-
-function print_colored
-    echo -e "$argv[1]""$argv[2..-1]""$NULL_COLOR"
-end
-function print_red
-    print_colored $RED "$argv"
-end
-function print_yellow
-    print_colored $YELLOW"$argv"
-end
-function print_green
-    print_colored $GREEN "$argv"
-end
-
-function print_error
-    print_red "ERROR:" "$argv"
-end
-function print_warning
-    print_yellow "WARNING:" "$argv"
-end
-function print_success
-    print_green "SUCCESS:" "$argv"
-end
-
-funcsave is_root
-
-funcsave print_exec
-
-funcsave print_colored
-funcsave print_red
-funcsave print_yellow
-funcsave print_green
-
-funcsave print_error
-funcsave print_warning
-funcsave print_success
 
 # VARIABLES
 
@@ -65,6 +21,8 @@ if ! is_root
     exit 1
 end
 
+print_success "RUNNING AS ROOT"
+
 # INSTALLING DEPENDENCIES
 
 print_exec cd $BASEDIR
@@ -75,7 +33,8 @@ if ! print_exec apt install (string split ' ' (cat ./dependencies.txt)) -y
     print_error "apt failed to install some or all dependencies"
     exit 1
 end
-echo "Successfully installed all dependencies"
+
+print_success "Successfully installed all dependencies"
 
 # APT FULL-UPGRADE
 
@@ -85,7 +44,7 @@ print_exec apt update
 print_exec apt full-upgrade -y
 print_exec apt autoremove -y
 
-echo "Done upgrading"
+print_success "Done upgrading"
 
 # COPY UTILITIES
 
@@ -97,6 +56,7 @@ print_exec cd "scripts/utils"
 
 for script in (find . -type f)
     set scriptinstallpath "/usr/bin/"(basename $script ".fish")
+    set scriptinstallpath "/usr/bin/"(basename $scriptinstallpath ".sh")
     if ! print_exec cp $script $scriptinstallpath
         print_error "Error copying $script"
         exit 1

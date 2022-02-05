@@ -26,6 +26,8 @@ end
 
 # LOGIC START
 
+print_exec mkdir /etc/router
+
 print_exec cp ./router.config.fish /usr/bin/router_config
 print_exec chmod 777 /usr/bin/router_config
 
@@ -76,6 +78,8 @@ end
 
 print_green "WAN_INTERFACE is: $WAN_INTERFACE"
 
+echo $WAN_INTERFACE > "/etc/router/WAN_INTERFACE"
+
 # setup forwarding
 
 print_exec echo 1 > /proc/sys/net/ipv4/ip_forward
@@ -84,19 +88,21 @@ print_exec echo 1 > /proc/sys/net/ipv4/ip_forward
 # remove netplans
 
 for it in (find /etc/netplan/ -type f)
-    print_exec rm it
+    print_exec chattr -i $it
+    print_exec rm $it
 end
 
 # setup neplan
 
-set NEPLAN_FILE "/etc/netplan/50-cloud-init.yaml"
+set NETPLAN_FILE "/etc/netplan/50-cloud-init.yaml"
 
-print_exec rm NETPLAN_FILE
+print_exec chattr -i $NETPLAN_FILE
+print_exec rm $NETPLAN_FILE
 
 print_exec touch $NETPLAN_FILE
 
 echo "network:" >> $NETPLAN_FILE
-echo "  version:2" >> $NETPLAN_FILE
+echo "  version: 2" >> $NETPLAN_FILE
 echo "  ethernets:" >> $NETPLAN_FILE
 echo "    $WAN_INTERFACE:" >> $NETPLAN_FILE
 echo "      dhcp4: true" >> $NETPLAN_FILE
@@ -107,6 +113,8 @@ echo "      dhcp6: no" >> $NETPLAN_FILE
 echo "      addresses: [$LAN_ROOT_IP_MASK]" >> $NETPLAN_FILE
 
 print_exec cat $NETPLAN_FILE
+
+print_exec chattr +i $NETPLAN_FILE
 
 if ! print_exec netplan apply
     print_error "NETPLAN ERROR! Aborting..." 

@@ -81,7 +81,7 @@ def set_power(v: float):
     if v > 1.0 or v < 0:
         raise Exception("Power must be in range from 0.0 to 1.0")
     n = int(v * 255)
-    if(v > 0 and n == 0)
+    if(v > 0 and n == 0):
         n = 1
     lgpio.i2c_write_byte(i2c, ADDR_POWER)
     lgpio.i2c_write_byte(i2c, n)
