@@ -33,8 +33,16 @@ print_exec cp ./autovpn.fish /usr/bin/auto_vpn
 print_exec chmod 777 /usr/bin/auto_vpn
 
 print_exec mkdir /etc/autovpn
+print_exec chown ubuntu:ubuntu /etc/autovpn
 print_exec cp ./autovpn.py /etc/autovpn/autovpn.py
 print_exec chmod 777 /etc/autovpn/autovpn.py
+print_exec touch /etc/autovpn/state.conf
+print_exec touch /etc/autovpn/permastate.conf
+
+print_exec chown ubuntu:ubuntu /etc/autovpn/state.conf
+print_exec chown ubuntu:ubuntu /etc/autovpn/permastate.conf
+print_exec chown ubuntu:ubuntu /etc/autovpn/servers
+
 
 print_exec mkdir /etc/autovpn/servers
 cat config.default.conf | sed "s/LAN_INTERFACE/$LAN_INTERFACE/g" > ./config.tmp.conf

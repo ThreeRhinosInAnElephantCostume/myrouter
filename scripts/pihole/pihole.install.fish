@@ -5,8 +5,6 @@ if ! is_root
     exit 1
 end
 
-set -e
-
 if test -e "/usr/local/bin/pihole"
     print_success "Pihole already installed, exiting..."
     exit 0

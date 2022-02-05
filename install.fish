@@ -130,7 +130,7 @@ print_success "Done installing auto_vpn"
 # SUCCESS
 
 print_exec cd $BASEDIR 
-print_success "INSTALLATION SCUCCESSFUL!"
+print_success "INSTALLATION SUCCESSFUL!"
 
 print_yellow "NOTE: Manual PIHOLE configuration required."
 

@@ -13,10 +13,10 @@ function print_exec
     $argv
 end
 
-set RED '\033[0;31m'
-set YELLOW '\033[0;33m'
-set GREEN '\033[0;32m'
-set NULL_COLOR '\033[0m'
+set -Ux RED '\033[0;31m'
+set -Ux YELLOW '\033[0;33m'
+set -Ux GREEN '\033[0;32m'
+set -Ux NULL_COLOR '\033[0m'
 
 function print_colored
     echo -e "$argv[1]""$argv[2..-1]""$NULL_COLOR"
