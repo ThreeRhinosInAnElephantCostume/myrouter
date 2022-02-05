@@ -1,5 +1,9 @@
 #!/usr/bin/fish
 
+if ! router_commands
+    echo "COULD NOT LOAD THE COMMANDS FILE. Corrupted installation?"
+    exit 1
+end
 
 # SANITY CHECKS
 if ! is_root 

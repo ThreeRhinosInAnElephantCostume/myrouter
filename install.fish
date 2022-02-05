@@ -10,6 +10,7 @@ if ! ./commands.fish
     exit 1
 end
 
+
 # VARIABLES
 
 set BASEDIR (pwd)
@@ -22,6 +23,9 @@ if ! is_root
 end
 
 print_success "RUNNING AS ROOT"
+
+print_exec cp ./commands.fish /usr/bin/router_commands
+print_exec chmod 777 /usr/bin/router_commands
 
 # INSTALLING DEPENDENCIES
 
