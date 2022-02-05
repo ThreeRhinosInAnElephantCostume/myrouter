@@ -39,8 +39,10 @@ echo "allowing one second for interfaces to get their shit together"
 
 sleep 1
 
-#set up forwarding
+#setup forwarding
 echo "setting up forwarding"
+echo 1 > /proc/sys/net/ipv4/ip_forward
+
 print_exec iptables -t nat -A POSTROUTING -o $WAN_INTERFACE -j MASQUERADE
 print_exec iptables -A INPUT -i $WAN_INTERFACE -j ACCEPT
 print_exec iptables -A INPUT -i $LAN_INTERFACE -m state --state ESTABLISHED,RELATED -j ACCEPT
@@ -49,8 +51,8 @@ print_exec iptables -A OUTPUT -j ACCEPT
 echo "setting up packet multithreading"
 #This may or may not increase performance
 #Remove if it causes any issues
-print_exec echo 2 > /sys/class/net/$LAN_INTERFACE/queues/rx-0/rps_cpus
-print_exec echo 1 > /sys/class/net/$WAN_INTERFACE/queues/rx-0/rps_cpus
+echo 2 > /sys/class/net/$LAN_INTERFACE/queues/rx-0/rps_cpus
+echo 1 > /sys/class/net/$WAN_INTERFACE/queues/rx-0/rps_cpus
 
 echo "ensure that ipv6 is disabled" # also made changes to /etc/sysctl.conf and /etc/sysctl.d/40-ipv6.con
 print_exec ip6tables -P INPUT DROP

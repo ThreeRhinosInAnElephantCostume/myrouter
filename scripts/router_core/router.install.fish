@@ -72,6 +72,8 @@ if test ! -n "$WAN_INTERFACE"
         set interfacen (dialog --no-cancel --menu "Select the internet-facing interface:" 18 70 15 \
             (echo $interfaces | sed "s/ /\n/g" | nl --number-separator=(echo -e " ") | sed "s/[ ]/\n/g" | grep -v "^\$")\
             3>&1 1>&2 2>&3 3>&-)
+        # aaaaand back into an array
+        set interfaces (string split ' ' $interfaces)
         set interface $interfaces[$interfacen]
         if test ! -n "$interface"
             print_error "INVALID INTERFACE SELECTED"
@@ -87,7 +89,7 @@ echo $WAN_INTERFACE > "/etc/router/WAN_INTERFACE"
 
 # setup forwarding
 
-print_exec echo 1 > /proc/sys/net/ipv4/ip_forward
+echo 1 > /proc/sys/net/ipv4/ip_forward
 
 
 # remove netplans
@@ -132,3 +134,11 @@ print_exec cp ./router.service /etc/systemd/system/router.service
 print_exec systemctl daemon-reload
 print_exec systemctl stop router
 print_exec systemctl enable router
+
+# setup the firewall
+
+ufw default allow outgoing 
+ufw default allow forward
+ufw allow from $LAN_NET_IP_MASK
+
+ufw enable

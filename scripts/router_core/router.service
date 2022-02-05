@@ -7,10 +7,10 @@ Wants=network-online.target
 After=network.target
 
 [Service]
-ExecStart=/usr/bin/router_start
+ExecStart=/usr/bin/sudo /usr/bin/router_start
 # don't use 'nobody' if your script needs to access user files
 # (if User is not set the service will run as root)
-#User=nobody
+User=ubuntu
 
 # Useful during debugging; remove it once the service is working
 #StandardOutput=console
