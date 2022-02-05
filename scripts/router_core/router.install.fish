@@ -42,7 +42,7 @@ if ! router_config
     exit 1
 end
 
-set interfaces (ip link list | grep -Eo "^[0-9]*: [A-z0-9]*" | grep -Po "(?![0-9]*:)(?! ).*")
+set interfaces (ip link list | grep -Eo "^[0-9]*: [A-z0-9\-]*" | grep -Po "(?![0-9]*:)(?! ).*")
 set forbidden lo $LAN_INTERFACE $WIFI_INTERFACE
 for int in $forbidden
     set exp "s/[ ]*"$int"[ ]*//g"
@@ -58,13 +58,18 @@ if test ! -n "$WAN_INTERFACE"
         exit 1
     end
 
+    # turning it into an array
+    set interfaces (string split ' ' $interfaces)
+
     print_green "Valid interfaces: "$interfaces
 
     if test (count $interfaces) -eq 1
         echo "Only one valid interface found, selecting it as WAN_INTERFACE"
         set -Ux WAN_INTERFACE $interfaces[1]
     else
-        set interfacen (dialog --no-cancell --menu "Select the internet-facing interface:" 18 70 15 \
+        # turning it back into a single argument. I know it's a mess, DON'T JUDGE ME! I gotta to have it done in like 3h...
+        set interfaces (echo $interfaces) 
+        set interfacen (dialog --no-cancel --menu "Select the internet-facing interface:" 18 70 15 \
             (echo $interfaces | sed "s/ /\n/g" | nl --number-separator=(echo -e " ") | sed "s/[ ]/\n/g" | grep -v "^\$")\
             3>&1 1>&2 2>&3 3>&-)
         set interface $interfaces[$interfacen]
