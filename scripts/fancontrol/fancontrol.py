@@ -63,17 +63,16 @@ def set_config(_dt):
         dt = _dt
     else:
         dt = _dt.convert()
-    print("set config",  dt)
     lgpio.i2c_write_byte(i2c, ADDR_CONFIG)
     lgpio.i2c_write_byte(i2c, dt)
 
 def set_test(b: bool):
-    conf = get_config()
+    conf = Config()
     conf.test = b
     set_config(conf)
 
 def set_enabled(b: bool):
-    conf = get_config()
+    conf = Config()
     conf.fan_enable = b
     set_config(conf)
 
