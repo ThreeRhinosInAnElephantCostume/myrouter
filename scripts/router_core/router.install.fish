@@ -152,6 +152,7 @@ print_exec systemctl enable router
 ufw default allow outgoing 
 ufw default allow forward
 ufw allow from $LAN_NET_IP_MASK
+ufw allow from $WIFI_NET_IP_MASK
 
 ufw allow bootps
 ufw allow 53/udp
