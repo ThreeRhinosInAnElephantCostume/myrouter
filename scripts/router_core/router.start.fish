@@ -69,4 +69,13 @@ print_exec router_start_dnsvpn
 echo "done"
 
 
+# setup resolv-conf
+
+echo "ensuring correct /etc/resolv.conf"
+
+print_exec chattr -i /etc/resolv.conf
+print_exec rm /etc/resolv.conf
+print_exec touch /etc/resolv.conf
+echo "nameserver 127.0.0.1" > /etc/resolv.conf
+print_exec chattr +i /etc/resolv.conf
 

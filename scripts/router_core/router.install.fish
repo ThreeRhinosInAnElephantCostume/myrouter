@@ -83,50 +83,35 @@ print_exec echo 1 > /proc/sys/net/ipv4/ip_forward
 
 # remove netplans
 
-for it in (find /run/systemd/network -type f)
+for it in (find /etc/netplan/ -type f)
     print_exec rm it
 end
 
-# add new netplans
+# setup neplan
 
-set LAN_FILE "/run/systemd/network/10-netplan-"$LAN_INTERFACE".network"
-set WAN_FILE "/run/systemd/network/10-netplan-"$WAN_INTERFACE".network"
+set NEPLAN_FILE "/etc/netplan/50-cloud-init.yaml"
 
-# LAN
+print_exec rm NETPLAN_FILE
 
-print_exec touch $WAN_FILE
+print_exec touch $NETPLAN_FILE
 
-echo "[Match]" >> $WAN_FILE
-echo "Name=$WAN_INTERFACE" >> $WAN_FILE
+echo "network:" >> $NETPLAN_FILE
+echo "  version:2" >> $NETPLAN_FILE
+echo "  ethernets:" >> $NETPLAN_FILE
+echo "    $WAN_INTERFACE:" >> $NETPLAN_FILE
+echo "      dhcp4: true" >> $NETPLAN_FILE
+echo "      optional: true" >> $NETPLAN_FILE
+echo "    $LAN_INTERFACE:" >> $NETPLAN_FILE
+echo "      dhcp4: no" >> $NETPLAN_FILE
+echo "      dhcp6: no" >> $NETPLAN_FILE
+echo "      addresses: [$LAN_ROOT_IP_MASK]" >> $NETPLAN_FILE
 
-echo "[Network]" >> $WAN_FILE
-echo "DHCP=ipv4" >> $WAN_FILE
-echo "LinkLocalAddressing=ipv6" >> $WAN_FILE
+print_exec cat $NETPLAN_FILE
 
-echo "[DHCP]" >> $WAN_FILE
-echo "RouteMetric=100" >> $WAN_FILE
-echo "UseMTU=true" >> $WAN_FILE
-
-print_exec cat $WAN_FILE
-
-# WAN
-
-print_exec touch $LAN_FILE
-
-echo "[Match]" >> $LAN_FILE
-echo "Name=$LAN_INTERFACE" >> $LAN_FILE
-
-echo "[Network]" >> $LAN_FILE
-echo "LinkLocalAddressing=ipv6" >> $LAN_FILE
-echo "Address=$LAN_ROOT_IP_MASK" >> $LAN_FILE
-
-print_exec cat $LAN_FILE
-
-# setup resolv-conf
-
-print_exec chattr -i /etc/resolv.conf
-print_exec echo "nameserver 127.0.0.1" > /etc/resolv.conf
-print_exec chattr +i /etc/resolv.conf
+if ! print_exec netplan apply
+    print_error "NETPLAN ERROR! Aborting..." 
+    exit 1
+end
 
 # setup the service and enable it
 
