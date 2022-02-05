@@ -107,6 +107,7 @@ if(not os.path.isfile(CONFIG_PATH)):
         print("ERROR: Could not copy config, ensure", CONFIG_PATH, "and", DEFAULT_CONFIG_PATH, "exist")
         exit(1)
 while(True):
+    i2c = lgpio.i2c_open(1, ADDRESS)
     jsondata = ""
     try:
         with open(CONFIG_PATH) as file:
@@ -158,6 +159,10 @@ while(True):
         exit(1)
     print("New power:", power, "at temp", temp)
     try:
+        set_enabled(True)  
+        time.sleep(0.01)
+        set_power(power)    
+        time.sleep(0.1)
         set_power(power)    
     except:
         print("Failed to write I2C!")
