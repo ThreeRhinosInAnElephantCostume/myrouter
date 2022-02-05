@@ -1,1 +1,1 @@
-build-essential cmake git i2c-tools python3-smbus python3-lgpio ipython3 tree htop build-essential byobu fish python-is-python3 raspi-config cpufrequtils dialog nmap arp-scan wireguard whois hostapd rfkill
+build-essential cmake git i2c-tools python3-smbus python3-lgpio ipython3 tree htop build-essential byobu fish python-is-python3 raspi-config cpufrequtils dialog nmap arp-scan wireguard whois hostapd rfkill iperf3
