@@ -51,4 +51,6 @@ print_exec systemctl enable systemd-networkd
 
 cat ./hostapd.default.conf | sed "s/SSID/$SSID/g" | sed "s/PASSWORD/$PASSWORD/g" | sed "s/WIFI_INTERFACE/$WIFI_INTERFACE/g"  > /etc/hostapd/hostapd.conf
 
+print_warning "MANUAL DHCP CONFIG REQUIRED!"
+
 rfkill unblock wlan

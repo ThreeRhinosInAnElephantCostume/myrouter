@@ -82,10 +82,9 @@ print_exec chattr +i /etc/resolv.conf
 #double-ensure forwarding
 
 echo 1 > /proc/sys/net/ipv4/ip_forward
+print_exec sysctl -w net.ipv4.ip_forward=1
 
 # setup wifi
 
-print_exec sysctl -w net.ipv4.ip_forward=1
-print_exec iptables -A FORWARD -i $WIFI_INTERFACE -o $LAN_INTERFACE -j ACCEPT
-print_exec iptables -A FORWARD -i $LAN_INTERFACE -o $WIFI_INTERFACE -j ACCEPT
-print_exec ip route add 192.168.0.0/24 dev $WIFI_INTERFACE
+print_exec ip route add $WIFI_NET_IP_MASK via $WIFI_ROOT_IP dev $WIFI_INTERFACE
+print_exec ip route add $LAN_NET_IP_MASK via $LAN_ROOT_IP dev $LAN_INTERFACE

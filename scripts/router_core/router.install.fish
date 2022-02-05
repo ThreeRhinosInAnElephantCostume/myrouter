@@ -45,7 +45,7 @@ end
 set interfaces (ip link list | grep -Eo "^[0-9]*: [A-z0-9\-]*" | grep -Po "(?![0-9]*:)(?! ).*")
 set forbidden lo $LAN_INTERFACE $WIFI_INTERFACE
 for int in $forbidden
-    set exp "s/[ ]*"$int"[ ]*//g"
+    set exp "s/[ ]*"$int"[ ]*/ /g"
     set interfaces (echo $interfaces | sed $exp)
 end
 
@@ -57,6 +57,8 @@ if test ! -n "$WAN_INTERFACE"
         print_error "NO VALID WAN INTERFACES FOUND!"
         exit 1
     end
+
+    set interfaces (echo $interfaces | sed "s/^ //g")
 
     # turning it into an array
     set interfaces (string split ' ' $interfaces)
@@ -150,5 +152,9 @@ print_exec systemctl enable router
 ufw default allow outgoing 
 ufw default allow forward
 ufw allow from $LAN_NET_IP_MASK
+
+ufw allow bootps
+ufw allow 53/udp
+ufw allow 53/tcp
 
 ufw enable
