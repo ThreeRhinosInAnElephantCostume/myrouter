@@ -2,3 +2,5 @@ commands.draft.txt
 commands.draft.sh
 commands.draft.fish
 scripts/vP
+scripts/pihole/Pi-hole/*
+scripts/pihole/Pi-hole

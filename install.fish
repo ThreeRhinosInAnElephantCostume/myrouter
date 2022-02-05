@@ -134,6 +134,21 @@ end
 
 print_success "Done installing router_core"
 
+# 
+
+echo "Installing pihole"
+
+print_exec cd $BASEDIR
+print_exec scripts/pihole
+
+if ! print_exe ./pihole.install.fish
+    print_error "Error installing pihole, aborting..."
+    exit 1
+end
+
+print_success "Successfully installed pihole"
+print_warning "Check the webserver for further configuration!"
+
 # INSTALL AUTO_VPN
 
 echo "Installing auto_vpn"
