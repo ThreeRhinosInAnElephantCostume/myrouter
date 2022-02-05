@@ -67,7 +67,7 @@ if test ! -n "$WAN_INTERFACE"
         echo "Only one valid interface found, selecting it as WAN_INTERFACE"
         set -Ux WAN_INTERFACE $interfaces[1]
     else
-        # turning it back into a single argument. I know it's a mess, DON'T JUDGE ME! I gotta to have it done in like 3h...
+        # turning it back into a single argument. I know it's a mess, DON'T JUDGE ME! I've gotta have it done in like 3h...
         set interfaces (echo $interfaces) 
         set interfacen (dialog --no-cancel --menu "Select the internet-facing interface:" 18 70 15 \
             (echo $interfaces | sed "s/ /\n/g" | nl --number-separator=(echo -e " ") | sed "s/[ ]/\n/g" | grep -v "^\$")\
@@ -113,6 +113,7 @@ echo "  version: 2" >> $NETPLAN_FILE
 echo "  ethernets:" >> $NETPLAN_FILE
 echo "    $WAN_INTERFACE:" >> $NETPLAN_FILE
 echo "      dhcp4: true" >> $NETPLAN_FILE
+echo "      dhcp6: no" >> $NETPLAN_FILE
 echo "      optional: true" >> $NETPLAN_FILE
 echo "    $LAN_INTERFACE:" >> $NETPLAN_FILE
 echo "      dhcp4: no" >> $NETPLAN_FILE
@@ -127,6 +128,11 @@ if ! print_exec netplan apply
     print_error "NETPLAN ERROR! Aborting..." 
     exit 1
 end
+
+# disable ipv6 on the WAN interface
+
+sudo sysctl -w net.ipv6.conf.$WAN_INTERFACE.disable_ipv6=1
+
 
 # setup the service and enable it
 

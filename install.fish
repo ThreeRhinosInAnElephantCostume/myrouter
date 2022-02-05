@@ -98,6 +98,18 @@ end
 
 print_success "Done installing router_core"
 
+# SETUP WIFI
+
+echo "Setting up the wifi bridged access point"
+
+print_exec cd $BASEDIR 
+print_exec cd scripts/wifi
+
+if ! print_exec ./wifi.install.fish
+    print_error "Failed to setup wifi, aborting..."    
+    exit 1
+end
+
 # 
 
 echo "Installing pihole"
@@ -126,6 +138,7 @@ if ! print_exec ./autovpn.install.fish
 end
 
 print_success "Done installing auto_vpn"
+
 
 # SUCCESS
 

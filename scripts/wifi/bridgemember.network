@@ -1,0 +1,5 @@
+[Match]
+Name=LAN_INTERFACE
+
+[Network]
+Bridge=br0

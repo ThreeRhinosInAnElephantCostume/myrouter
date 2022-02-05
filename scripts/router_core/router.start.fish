@@ -57,23 +57,17 @@ echo 1 > /sys/class/net/$WAN_INTERFACE/queues/rx-0/rps_cpus
 echo "ensure that ipv6 is disabled" # also made changes to /etc/sysctl.conf and /etc/sysctl.d/40-ipv6.con
 print_exec ip6tables -P INPUT DROP
 
-#echo "starting dnsvpn"
-#start vpn-ing dns traffic
-#sudo /home/ubuntu/startdnsvpn
-
-echo "waiting one second for dnsvpn to start"
-#ensure no conflict with the vpn
-sleep 1
-
 echo "restoring autovpn"
 print_exec auto_vpn start
 echo "waiting for vpns to start"
-
 sleep 1
+
 echo "starting dnsvpn"
 print_exec router_start_dnsvpn
 echo "done"
 
+echo "waiting one second for dnsvpn to start"
+sleep 1
 
 # setup resolv-conf
 

@@ -4,3 +4,5 @@ commands.draft.fish
 scripts/vP
 scripts/pihole/Pi-hole/*
 scripts/pihole/Pi-hole
+scripts/wifi/SSID.txt
+scripts/wifi/PASSWORD.txt

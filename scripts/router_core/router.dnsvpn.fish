@@ -2,15 +2,17 @@
 
 # SANITY CHECKS
 
-if ! is_root 
-    print_error "NOT ROOT"
-    exit 1
-end
 
 if ! router_config
     print_error "ROUTER CONFIG RETURNED AN ERROR! Aborting..."
     exit 1
 end
+
+if ! is_root 
+    print_error "NOT ROOT"
+    exit 1
+end
+
 
 # LOGIC START
 
