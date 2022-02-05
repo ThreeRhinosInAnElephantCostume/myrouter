@@ -139,9 +139,9 @@ print_success "Done installing router_core"
 echo "Installing pihole"
 
 print_exec cd $BASEDIR
-print_exec scripts/pihole
+print_exec cd scripts/pihole
 
-if ! print_exe ./pihole.install.fish
+if ! print_exec ./pihole.install.fish
     print_error "Error installing pihole, aborting..."
     exit 1
 end
