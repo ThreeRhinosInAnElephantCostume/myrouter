@@ -167,6 +167,9 @@ print_success "Done installing auto_vpn"
 
 print_exec cd $BASEDIR 
 print_success "INSTALLATION SCUCCESSFUL!"
+
+print_yellow "NOTE: Manual PIHOLE configuration required."
+
 print_warning "-----> RESTART REQUIRED! <-----"
 
 exit 0
