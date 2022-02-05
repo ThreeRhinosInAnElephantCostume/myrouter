@@ -46,11 +46,11 @@ if test -e "/etc/autovpn/config.conf"
 end
 
 print_exec mkdir /etc/autovpn/servers
-cat config.default.conf | sed "s/LAN_INTERFACE/$LAN_INTERFACE/g" | sed "s/VPN_IP/$DEFAULT_VPN_IP/g"  > ./config.tmp.conf
+cat config.default.conf | sed "s/LAN_INTERFACE/$LAN_INTERFACE/g" | sed "s/DEFAULT_VPN_IP/$DEFAULT_VPN_IP/g"  > ./config.tmp.conf
 print_exec cp ./config.tmp.conf /etc/autovpn/config.conf
 print_exec rm ./config.tmp.conf
 
-
+print_exec chown ubuntu:ubuntu /etc/autovpn/config.conf
 print_exec chown ubuntu:ubuntu /etc/autovpn/state.conf
 print_exec chown ubuntu:ubuntu /etc/autovpn/permastate.conf
 print_exec chown ubuntu:ubuntu /etc/autovpn/servers
