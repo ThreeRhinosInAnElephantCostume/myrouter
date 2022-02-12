@@ -22,9 +22,6 @@ DELAY=2
 
 ADDRESS=0x42
 
-ADDR_POWER=0x0
-ADDR_CONFIG=0x1
-
 DRYDEFAULT = False
 
 def bash(commandline:str, quiet=False, dry=DRYDEFAULT):
@@ -35,6 +32,8 @@ def bash(commandline:str, quiet=False, dry=DRYDEFAULT):
     if not dry:
         return subprocess.run(commandline)
     return ""
+
+i2c = lgpio.i2c_open(1, ADDRESS)
 
 def set_power(v: float):
     if v > 1.0 or v < 0:
@@ -73,6 +72,7 @@ while(True):
         try:
             with open(CONFIG_PATH) as file:
                 jsondata = file.read()
+            break
         except:
             readfails += 1
             print("Error reading", CONFIG_PATH)
@@ -102,6 +102,7 @@ while(True):
     while True:
         try: 
             temp = float(subprocess.check_output(["cat", TEMP_PATH]))/1000.0
+            break
         except:
             readfails += 1
             print("Error reading temperature from", TEMP_PATH)
@@ -137,8 +138,6 @@ while(True):
         exit(1)
     print("New power:", power, "at temp", temp)
     try:
-        set_enabled(True)  
-        time.sleep(0.01)
         set_power(power)    
         time.sleep(0.1)
         set_power(power)    
