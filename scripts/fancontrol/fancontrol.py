@@ -10,6 +10,9 @@ import subprocess
 import sys
 import pathlib
 
+READ_RETRIES = 5
+READ_FAIL_DELAY = 1
+
 TEMP_PATH = "/sys/class/thermal/thermal_zone0/temp"
 CONFIG_PATH_REQ_DIRS = ["/etc/fancontrol"]
 CONFIG_PATH = "/etc/fancontrol/fancontrol.config.json"
@@ -33,56 +36,12 @@ def bash(commandline:str, quiet=False, dry=DRYDEFAULT):
         return subprocess.run(commandline)
     return ""
 
-class Config:
-    fan_enable = False
-    test = False
-    def convert(self)->int:
-        return (self.fan_enable << 0) | (self.test << 1)
-    def __init__(self, v:int=None):
-        if(v is not None):
-            self.fan_enable = bool(v & (1 << 0))
-            self.test = bool(v & (1 << 1))
-
-i2c = lgpio.i2c_open(1, ADDRESS)
-
-def get_config()->Config:
-    lgpio.i2c_write_byte(i2c, ADDR_CONFIG)
-    dt = lgpio.i2c_read_byte(i2c)
-    print("get config", dt)
-    return Config(dt)
-
-def get_power()->int:
-    lgpio.i2c_write_byte(i2c, ADDR_POWER)
-    dt = lgpio.i2c_read_byte(i2c)
-    print("get power", dt)
-    return dt
-
-def set_config(_dt):
-    dt = 0
-    if isinstance(_dt, int):
-        dt = _dt
-    else:
-        dt = _dt.convert()
-    lgpio.i2c_write_byte(i2c, ADDR_CONFIG)
-    lgpio.i2c_write_byte(i2c, dt)
-
-def set_test(b: bool):
-    conf = Config()
-    conf.test = b
-    set_config(conf)
-
-def set_enabled(b: bool):
-    conf = Config()
-    conf.fan_enable = b
-    set_config(conf)
-
 def set_power(v: float):
     if v > 1.0 or v < 0:
         raise Exception("Power must be in range from 0.0 to 1.0")
     n = int(v * 255)
     if(v > 0 and n == 0):
         n = 1
-    lgpio.i2c_write_byte(i2c, ADDR_POWER)
     lgpio.i2c_write_byte(i2c, n)
     
 # <<-------------------->> 
@@ -108,12 +67,22 @@ if(not os.path.isfile(CONFIG_PATH)):
 while(True):
     i2c = lgpio.i2c_open(1, ADDRESS)
     jsondata = ""
-    try:
-        with open(CONFIG_PATH) as file:
-            jsondata = file.read()
-    except:
-        print("Error reading", CONFIG_PATH)
-        exit(1)
+
+    readfails = 0
+    while True:
+        try:
+            with open(CONFIG_PATH) as file:
+                jsondata = file.read()
+        except:
+            readfails += 1
+            print("Error reading", CONFIG_PATH)
+            if(readfails < READ_RETRIES):
+                print("Trying again in", READ_FAIL_DELAY, "seconds")
+                time.sleep(READ_FAIL_DELAY)
+            else:
+                print("Failed to read", CONFIG_PATH, "aborting...")
+                exit(1)
+
     config = json.loads(jsondata, parse_int=float)
     mintemp = config["min_temperature"]
     if not isinstance(mintemp, float):
@@ -128,11 +97,21 @@ while(True):
             print("All elements of the curve must be arrays of two floats (temp, power)")
             exit(1)
     temp = 0
-    try: 
-        temp = float(subprocess.check_output(["cat", TEMP_PATH]))/1000.0
-    except:
-        print("Error reading temperature from", TEMP_PATH)
-        exit(1)
+
+    readfails = 0
+    while True:
+        try: 
+            temp = float(subprocess.check_output(["cat", TEMP_PATH]))/1000.0
+        except:
+            readfails += 1
+            print("Error reading temperature from", TEMP_PATH)
+            if(readfails < READ_RETRIES):
+                print("Retrying in", READ_FAIL_DELAY, "seconds")
+                time.sleep(READ_FAIL_DELAY)
+            else:
+                print("Failed to read temperature from", TEMP_PATH, "aborting...")
+                exit(1)
+
     power = 0
     if len(curve) == 0:
         if temp >= mintemp:
